@@ -11,6 +11,7 @@ class Experiment():
         """
         self.parameters = parameters
         self.attributes = attributes
+        self.resources = None
 
     @abstractmethod
     def build(self):
@@ -26,6 +27,12 @@ class Experiment():
         """
         pass
 
+    def _fill_resources(resources: dict):
+        """
+        This is called by the enclosing study once the experiment is queued and
+        ready to run. The user can use the self.resources attribute.
+        """
+        self.resources = resources
 
     def __eq__(self, other):
         """
