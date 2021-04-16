@@ -27,7 +27,7 @@ class Experiment():
         """
         pass
 
-    def _fill_resources(resources: dict):
+    def _fill_resources(self, resources: dict):
         """
         This is called by the enclosing study once the experiment is queued and
         ready to run. The user can use the self.resources attribute.

@@ -3,15 +3,15 @@ import unittest
 from experiment import Experiment
 
 class TestExperiment1(Experiment):
-    def build():
+    def build(self):
         print("Building Test Experiment 1")
-    def run():
+    def run(self):
         print("Running Test Experiment 1")
 
 class TestExperiment2(Experiment):
-    def build():
+    def build(self):
         print("Building Test Experiment 2")
-    def run():
+    def run(self):
         print("Running Test Experiment 2")
 
 

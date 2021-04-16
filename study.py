@@ -20,35 +20,36 @@ class Study():
         self.continuable = continuable
         self.experiments = {} # dict mapping uuid : experiment
 
-        self.exp_result_dir = "~/studies/%s/" % self.name
+        self.exp_result_dir = "studies/%s/" % self.name
         create_folders(self.exp_result_dir)
 
-    def add_experiment(experiment):
+    def add_experiment(self, exp: Experiment):
         """
         Add experiment to the queue.
         """
-        if (experiment in self.experiments):
-            logging.warning("Experiment is already included in study. Skipping it.")
-        self.experiments.append(experiment)
+        expid = get_id_for_dict(exp.parameters)
+        if (expid in self.experiments):
+            logging.warning("Experiment %s is already included in study. Skipping it." % expid)
+        self.experiments[expid] = exp
 
     def wait_and_acquire_resources(self):
         """
         Wait until a full set of resources for one experiment are available
         and acquires them. Returns the resources as a dict.
         """
-        res, are_res_filled = False, {}
+        res, are_res_filled = {}, False
         while not are_res_filled:
             # Check if resource is available and required
             self.resourcePool_Lock.acquire()
-            for key in resourcePool:
-                if (len(resourcePool[key]) > 0 and not key in res):
-                    res[key] = resourcePool[key].pop()
+            for key in self.resourcePool:
+                if (len(self.resourcePool[key]) > 0 and not key in res):
+                    res[key] = self.resourcePool[key].pop()
             # Check if all resources are filled
-            if (set(resourcePool.keys()) == set(res.keys())):
+            if (set(self.resourcePool.keys()) == set(res.keys())):
                 are_res_filled = True
             # Give running threads a chance to return resources
             self.resourcePool_Lock.release()
-            time.sleep(100)
+            time.sleep(0.1)
         return res
 
     def release_resources(self, exp: Experiment):
@@ -65,12 +66,11 @@ class Study():
         """
         Try to recover previous state and run all/remaining experiments.
         """
-        for exp in self.experiments:
+        for expid in self.experiments:
             # Check if experiment file already exists
-            expid = get_id_for_dict(exp.parameters)
             if exists_file(self.exp_result_dir + expid):
-                print("Experiment with id %s exists. Skipping.")
-            self.run_experiment(exp)
+                print("Experiment with id %s exists. Skipping." % expid)
+            self.run_experiment(self.experiments[expid])
 
     def run_experiment(self, exp: Experiment):
         """
@@ -80,7 +80,8 @@ class Study():
         res = self.wait_and_acquire_resources()
         exp._fill_resources(res)
         # Resources for the experiment are filled. ready to start
-        t = Thread(target=run_with_cleanup, args=(self, exp))
+        t = Thread(target=self.run_with_cleanup, args=(exp,))
+        t.start()
 
     def run_with_cleanup(self, exp: Experiment):
         """
@@ -94,6 +95,9 @@ class Study():
         """
         Saves an experiment. Most probably gonna change.
         """
+        if not (get_id_for_dict(exp.parameters) in self.experiments):
+            logger.warning("Trying to save experiment that was not added to study. Aborting")
+            return
         fn = self.exp_result_dir + get_id_for_dict(exp.parameters)
         with open(fn, 'wb+') as outfile:
             pickle.dump(exp, outfile)
@@ -113,13 +117,13 @@ from pathlib import Path #pip install pathib2
 
 def get_id_for_dict(d: dict):
     unique_str = ''.join(["'%s':'%s';"%(key, val) for (key, val) in sorted(d.items())])
-    return hashlib.sha1(unique_str).hexdigest()
+    return hashlib.sha1(unique_str.encode('utf-8')).hexdigest()
 
 def exists_file(fn: str):
     if Path(fn).is_file():
-        return true
+        return True
     else:
-        return false
+        return False
 
 def create_folders(fp: str):
     Path(fp).mkdir(parents=True, exist_ok=True)
