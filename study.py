@@ -7,17 +7,14 @@ from experiment import Experiment
 
 class Study():
 
-    def __init__(self, name: str, resourcePool: dict, continuable: bool=True):
+    def __init__(self, name: str, resourcePool: dict):
         """
         resourcePool: dict of key:list, where the key denotes the resource type and
                       and the list contains the resources. e.g. {"gpu":[0,1,2]}
-        continuable : bool, The study tries to recover a previous state (true)
-                      or start over (false).
         """
         self.name = name
         self.resourcePool = resourcePool
         self.resourcePool_Lock = Lock()
-        self.continuable = continuable
         self.experiments = {} # dict mapping uuid : experiment
 
         self.exp_result_dir = "studies/%s/" % self.name

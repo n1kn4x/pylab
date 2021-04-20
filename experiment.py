@@ -12,6 +12,7 @@ class Experiment():
         self.parameters = parameters
         self.attributes = attributes
         self.resources = None
+        self.results = None
 
     @abstractmethod
     def build(self):
