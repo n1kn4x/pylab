@@ -3,7 +3,7 @@ import time
 import pickle
 import logging
 
-from experiment import Experiment
+from pylab.experiment import Experiment
 
 class Study():
 
