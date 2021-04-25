@@ -17,7 +17,7 @@ class Study():
         self.resourcePool_Lock = Lock()
         self.experiments = {} # dict mapping uuid : experiment
 
-        self.exp_result_dir = "studies/%s/" % self.name
+        self.exp_result_dir = "out/studies/%s/" % self.name
         create_folders(self.exp_result_dir)
 
     def add_experiment(self, exp: Experiment):
@@ -97,7 +97,7 @@ class Study():
             return
         fn = self.exp_result_dir + get_id_for_dict(exp.parameters)
         with open(fn, 'wb+') as outfile:
-            pickle.dump(exp, outfile)
+            pickle.dump(exp.get_save(), outfile)
 
     def stop(self):
         """

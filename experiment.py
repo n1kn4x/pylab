@@ -28,6 +28,20 @@ class Experiment():
         """
         pass
 
+    @abstractmethod
+    def get_save(self):
+        """
+        Get all objects needed to save the state of an experiment.
+        """
+        pass
+
+    @abstractmethod
+    def load(self, save):
+        """
+        Loads the state of an Experiment from a given save.
+        """
+        pass
+
     def _fill_resources(self, resources: dict):
         """
         This is called by the enclosing study once the experiment is queued and
