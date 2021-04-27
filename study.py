@@ -68,6 +68,7 @@ class Study():
             # Check if experiment file already exists
             if exists_file(self.exp_result_dir + expid):
                 print("Experiment with id %s exists. Skipping." % expid)
+                continue
             self.run_experiment(self.experiments[expid])
 
     def run_experiment(self, exp: Experiment):
