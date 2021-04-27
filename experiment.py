@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import hashlib
 
 class Experiment():
 
@@ -31,16 +32,16 @@ class Experiment():
     @abstractmethod
     def get_save(self):
         """
-        Get all objects needed to save the state of an experiment.
+        Get all objects needed to save the results of a finished experiment.
         """
         pass
 
-    @abstractmethod
-    def load(self, save):
+    def get_id(self):
         """
-        Loads the state of an Experiment from a given save.
+        Get the hashsum over the parameters of the experiment.
         """
-        pass
+        unique_str = ''.join(["'%s':'%s';"%(key, val) for (key, val) in sorted(self.parameters.items())])
+        return hashlib.sha1(unique_str.encode('utf-8')).hexdigest()
 
     def _fill_resources(self, resources: dict):
         """

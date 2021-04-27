@@ -2,6 +2,7 @@ from threading import Thread, Lock
 import time
 import pickle
 import logging
+from pathlib import Path #pip install pathib2
 
 from pylab.experiment import Experiment
 
@@ -24,7 +25,7 @@ class Study():
         """
         Add experiment to the queue.
         """
-        expid = get_id_for_dict(exp.parameters)
+        expid = exp.get_id()
         if (expid in self.experiments):
             logging.warning("Experiment %s is already included in study. Skipping it." % expid)
         self.experiments[expid] = exp
@@ -92,10 +93,10 @@ class Study():
         """
         Saves an experiment. Most probably gonna change.
         """
-        if not (get_id_for_dict(exp.parameters) in self.experiments):
+        if not (exp.get_id() in self.experiments):
             logger.warning("Trying to save experiment that was not added to study. Aborting")
             return
-        fn = self.exp_result_dir + get_id_for_dict(exp.parameters)
+        fn = self.exp_result_dir + exp.get_id()
         with open(fn, 'wb+') as outfile:
             pickle.dump(exp.get_save(), outfile)
 
@@ -107,14 +108,6 @@ class Study():
 
     def save(self):
         pass
-
-
-import hashlib
-from pathlib import Path #pip install pathib2
-
-def get_id_for_dict(d: dict):
-    unique_str = ''.join(["'%s':'%s';"%(key, val) for (key, val) in sorted(d.items())])
-    return hashlib.sha1(unique_str.encode('utf-8')).hexdigest()
 
 def exists_file(fn: str):
     if Path(fn).is_file():
