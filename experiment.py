@@ -18,7 +18,8 @@ class Experiment():
     @abstractmethod
     def build(self):
         """
-        Prepare and initialize the experiment.
+        Prepare and initialize the experiment. This is called automatically by the Study
+        once the resources are filled and the directly before the experiment is started.
         """
         pass
 

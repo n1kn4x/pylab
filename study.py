@@ -60,6 +60,8 @@ class Study():
         exp.resources = {}
         self.resourcePool_Lock.release()
 
+    # TODO instead of running a thread for each waiting exp, we have one waiting
+    # thread to start the next experiment
     def run_all(self):
         """
         Try to recover previous state and run all/remaining experiments.
@@ -86,6 +88,7 @@ class Study():
         """
         Runs the experiment, saves the result and releases the used resources.
         """
+        exp.build()
         exp.run()
         self.save_exp(exp)
         self.release_resources(exp)
